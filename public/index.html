@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>FoodRush — Order Fresh, Fast</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M7 2h2v9H7zm8 0h2v9h-2zM4 14v-2h16v2zm1 6v-4h2v4zm12 0v-4h2v4z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <header class="header">
+    <div class="brand">
+      <div class="logo">🍽️</div>
+      <div class="brand-text">Food<span>Rush</span></div>
+    </div>
+    <nav class="nav">
+      <button id="loginBtn" class="btn ghost">Login</button>
+      <button id="registerBtn" class="btn solid">Create Account</button>
+      <span id="userName" class="user hidden"></span>
+      <button id="logoutBtn" class="btn danger hidden">Logout</button>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>Crave it. Tap it. Get it.</h1>
+      <p>Fresh meals from curated restaurants, delivered hot & fast to your door.</p>
+      <div class="hero-actions">
+        <a href="#restaurants" class="btn solid lg">Browse Restaurants</a>
+        <a href="#menu" class="btn ghost lg">View Menu</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>50k+</strong><span>Orders</span></div>
+        <div><strong>4.8★</strong><span>Customer Rating</span></div>
+        <div><strong>120+</strong><span>Partner Restaurants</span></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <!-- Restaurants -->
+    <section id="restaurants" class="section">
+      <div class="section-head">
+        <h2>Featured Restaurants</h2>
+        <div class="filters">
+          <button class="chip active">All</button>
+          <button class="chip">Indian</button>
+          <button class="chip">Italian</button>
+          <button class="chip">Veg</button>
+        </div>
+      </div>
+      <div id="restaurantList" class="grid cards skeleton-grid">
+        <!-- skeletons injected first, replaced by JS -->
+      </div>
+    </section>
+
+    <!-- Menu -->
+    <section id="menu" class="section">
+      <div class="section-head">
+        <h2>Popular Dishes</h2>
+        <div class="search">
+          <input id="searchInput" class="input" placeholder="Search dishes… (e.g., pizza, biryani)"/>
+        </div>
+      </div>
+      <div id="menuList" class="grid cards skeleton-grid">
+        <!-- skeletons injected first, replaced by JS -->
+      </div>
+    </section>
+
+    <!-- Cart -->
+    <section class="section">
+      <div class="section-head">
+        <h2>Your Cart</h2>
+      </div>
+      <div id="cartList" class="card list"></div>
+    </section>
+
+    <!-- Orders -->
+    <section class="section">
+      <div class="section-head">
+        <h2>My Orders</h2>
+      </div>
+      <div id="ordersList" class="stack"></div>
+    </section>
+  </main>
+
+  <!-- Sticky Cart Bar -->
+  <div class="cart-bar">
+    <input id="addressInput" class="input address" placeholder="Delivery address"/>
+    <div class="cart-bar-right">
+      <span id="cartTotal" class="total">Total: ₹0</span>
+      <button id="checkoutBtn" class="btn solid">Checkout</button>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <dialog id="authDialog" class="dialog">
+    <form method="dialog" class="dialog-card glass" id="authForm">
+      <h3 id="authTitle" class="dialog-title">Login</h3>
+      <p class="muted">Welcome to FoodRush — sign in to continue.</p>
+      <div class="form-grid">
+        <input id="authName" class="input hidden" placeholder="Full name"/>
+        <input id="authEmail" class="input" type="email" placeholder="Email address" required/>
+        <input id="authPassword" class="input" type="password" placeholder="Password" required/>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn solid" id="authSubmit">Continue</button>
+        <button class="btn ghost" id="authCancel">Cancel</button>
+      </div>
+      <p id="authError" class="error"></p>
+    </form>
+  </dialog>
+
+  <!-- Toasts -->
+  <div id="toastContainer" class="toasts"></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
