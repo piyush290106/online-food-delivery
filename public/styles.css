@@ -9,6 +9,8 @@
   --brand-2:#4fd1c5;
   --danger:#ef4444;
   --shadow:0 10px 30px rgba(0,0,0,.35);
+  --cartbar-h: 84px;
+
 }
 
 *{box-sizing:border-box}
@@ -62,7 +64,7 @@ body{
 .hero-stats strong{font-size:18px}
 
 /* Layout */
-.container{max-width:1100px; margin:26px auto 120px; padding:0 18px}
+.container{max-width:1100px; margin:26px auto 0px; padding:0 18px; padding-bottom: calc(var(--cartbar-h) + 72px); }
 .section{margin-bottom:28px}
 .section-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
 .section h2{margin:0; font-size:22px}
@@ -129,11 +131,12 @@ body{
 
 /* Sticky cart bar */
 .cart-bar{
-  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  position:fixed; left:0; right:0; bottom:0; z-index:40;  min-height: var(--cartbar-h);
   display:flex; gap:10px; align-items:center; justify-content:center;
   padding:12px; border-top:1px solid var(--line);
   background:linear-gradient(0deg, rgba(10,11,15,.95), rgba(10,11,15,.85));
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+
 }
 .cart-bar-right{display:flex; gap:10px; align-items:center}
 .total{font-weight:800; padding:8px 12px; background:var(--glass); border:1px solid var(--line); border-radius:10px}
