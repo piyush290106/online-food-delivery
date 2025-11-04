@@ -94,7 +94,7 @@
     <input id="addressInput" class="input address" placeholder="Delivery address"/>
     <div class="cart-bar-right">
       <span id="cartTotal" class="total">Total: ₹0</span>
-      <button id="checkoutBtn" class="btn solid">Checkout</button>
+      <button id="checkoutBtn" class="btn solid">Place order</button>
     </div>
   </div>
 
@@ -120,5 +120,18 @@
   <div id="toastContainer" class="toasts"></div>
 
   <script src="app.js" defer></script>
+  
+  <!-- ...your existing markup... -->
+
+<section style="max-width:980px;margin:40px auto">
+  <h3>My Orders</h3>
+  <div id="orders-list"></div>
+</section>
+
+<!-- load the client JS (must be after the #orders-list element) -->
+<script src="/app.js"></script>
+</body>
+</html>
+
 </body>
 </html>

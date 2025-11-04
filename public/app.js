@@ -1,31 +1,56 @@
-"use strict";
-
-/* =========================================
-   API Helper
-========================================= */
 const API = {
-  get token() { return localStorage.getItem("token") || ""; },
-  set token(v) { v ? localStorage.setItem("token", v) : localStorage.removeItem("token"); },
+  get token() {
+    return localStorage.getItem("token") || "";
+  },
+  set token(v) {
+    v ? localStorage.setItem("token", v) : localStorage.removeItem("token");
+  },
+
   async get(path) {
     const res = await fetch(`/api${path}`, {
-      headers: { "Authorization": API.token ? `Bearer ${API.token}` : undefined }
+      headers: {
+        Authorization: API.token ? `Bearer ${API.token}` : undefined,
+      },
     });
-    if (!res.ok) throw new Error((await safeJson(res)).message || `GET ${path} failed`);
+    if (!res.ok)
+      throw new Error(
+        (await safeJson(res)).message || `GET ${path} failed`
+      );
     return res.json();
   },
+
   async post(path, body) {
     const res = await fetch(`/api${path}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": API.token ? `Bearer ${API.token}` : undefined
+        Authorization: API.token ? `Bearer ${API.token}` : undefined,
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error((await safeJson(res)).message || `POST ${path} failed`);
+    if (!res.ok)
+      throw new Error(
+        (await safeJson(res)).message || `POST ${path} failed`
+      );
     return res.json();
-  }
+  },
+
+  async patch(path, body) {
+    const headers = { "Content-Type": "application/json" };
+    if (API.token) headers.Authorization = `Bearer ${API.token}`;
+    const res = await fetch(`/api${path}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(body || {}),
+    });
+    if (!res.ok)
+      throw new Error(
+        (await safeJson(res)).message || `PATCH ${path} failed`
+      );
+    return res.json();
+  },
 };
+
 
 async function safeJson(res) {
   try { return await res.json(); } catch { return {}; }
@@ -184,14 +209,29 @@ async function loadOrders() {
     els.ordersList.innerHTML = `<p class="error">${e.message}</p>`;
   }
 }
+async function deliverOrder(orderId, buttonEl) {
+  try {
+    if (buttonEl) buttonEl.disabled = true;
+    await API.patch(`/orders/${orderId}/deliver`, { deliveredBy: "Web-UI" });
+    await loadOrders(); // re-render the list with updated status
+    toast.show("Order marked as delivered ✅");
+  } catch (e) {
+    toast.show(e.message || "Failed to mark delivered", "error", 3000);
+    if (buttonEl) buttonEl.disabled = false;
+  }
+}
+
 
 /* =========================================
    Renderers
 ========================================= */
 function renderRestaurants() {
   const filter = state.cuisineFilter;
-  const data = filter === "All" ? state.restaurants :
-    state.restaurants.filter(r => (r.cuisine || []).some(c => c.toLowerCase() === filter.toLowerCase()));
+  const data = filter === "All"
+    ? state.restaurants
+    : state.restaurants.filter(r =>
+        (r.cuisine || []).some(c => c.toLowerCase() === filter.toLowerCase())
+      );
 
   els.restaurantList.innerHTML = data.map(r => `
     <div class="card">
@@ -210,7 +250,7 @@ function renderRestaurants() {
     </div>
   `).join("");
 
-  // Bind menu buttons
+  // bind menu buttons after render
   els.restaurantList.querySelectorAll("[data-restaurant]").forEach(btn => {
     btn.addEventListener("click", () => {
       loadMenu(btn.dataset.restaurant);
@@ -219,6 +259,7 @@ function renderRestaurants() {
     });
   });
 }
+
 
 function renderMenu() {
   const q = (els.searchInput?.value || "").toLowerCase().trim();
@@ -291,17 +332,45 @@ function renderOrders(orders) {
     els.ordersList.innerHTML = `<p class="muted">No orders yet.</p>`;
     return;
   }
+
   els.ordersList.innerHTML = orders.map(o => `
-    <div class="order">
+    <div class="order" data-id="${o._id}" style="
+      background: #121828;
+      border: 1px solid #1d2642;
+      border-radius: 14px;
+      padding: 16px;
+      margin: 12px 0;
+      color: #e6ebff;
+    ">
       <div><b>Order #${o._id.slice(-6)}</b> • ${new Date(o.createdAt).toLocaleString()}</div>
       <div>Restaurant: ${o.restaurant?.name || "-"}</div>
-      <div>Status: ${o.status}</div>
-      <div>Items: ${o.items.map(it => `${it.menuItem?.name} × ${it.qty}`).join(", ")}</div>
+      <div>Status: <span class="status">${o.status}</span></div>
+      <div>Items: ${(o.items || [])
+        .map(it => `${it.menuItem?.name || "Item"} × ${it.qty}`)
+        .join(", ")}</div>
       <div>Total: ₹${o.total}</div>
       <div>Address: ${o.deliveryAddress}</div>
+
+      <button
+        class="btn-deliver"
+        data-deliver
+        ${o.status === "delivered" ? "disabled" : ""}
+        style="
+          margin-top: 10px;
+          padding: 10px 14px;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          background: linear-gradient(135deg, #6ea8ff, #7bb0ff);
+          color: #0a0f1e;
+          font-weight: bold;
+        ">
+        ${o.status === "delivered" ? "Delivered" : "Mark as Delivered"}
+      </button>
     </div>
   `).join("");
 }
+
 
 /* =========================================
    Cart Ops
@@ -421,6 +490,16 @@ els.chips?.forEach(ch => {
     renderRestaurants();
   });
 });
+// Orders: click "Mark as Delivered"
+els.ordersList?.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-deliver]");
+  if (!btn) return;
+  const card = btn.closest(".order");
+  const id = card?.dataset?.id;
+  if (!id) return;
+  deliverOrder(id, btn);
+});
+
 
 // Checkout
 els.checkoutBtn?.addEventListener("click", checkout);
